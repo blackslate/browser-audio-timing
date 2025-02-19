@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <link rel="stylesheet" href="styles.css">
+  <script defer src="audio.js"></script>
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <main>
+    <div id="predefined">
+      <p class="header"><span>First 100 seconds</span><span>One hundred and...</span><span>One hundred and eighty...</span></p>
+      <div id="selection"></div>
+      <div class="columns">
+        <div class="split one">
+          <div class="name">
+            <p>one</p>
+            <p>two</p>
+            <p>three</p>
+            <p>four</p>
+            <p>five</p>
+            <p>ten</p>
+            <p>twenty</p>
+            <p>forty</p>
+            <p>sixty</p>
+            <p>eighty</p>
+            <p>hundred</p>
+          </div>
+          <div class="times">
+            <p><span>1.0</span>   - <span>2.05</span>  </p>
+            <p><span>2.0</span>   - <span>3.05</span>  </p>
+            <p><span>3.0</span>   - <span>4.05</span>  </p>
+            <p><span>4.0</span>   - <span>5.05</span>  </p>
+            <p><span>5.0</span>   - <span>6.05</span>  </p>
+            <p><span>10.0</span>  - <span>11.05</span> </p>
+            <p><span>20.0</span>  - <span>21.05</span> </p>
+            <p><span>40.0</span>  - <span>41.05</span> </p>
+            <p><span>60.0</span>  - <span>61.05</span> </p>
+            <p><span>80.0</span>  - <span>81.05</span> </p>
+            <p><span>100.0</span> - <span>101.05</span></p>
+          </div>
+        </div>
+        <div class="split hundred">
+          <div class="name">
+            <p>one</p>
+            <p>two</p>
+            <p>three</p>
+            <p>four</p>
+            <p>five</p>
+            <p>ten</p>
+            <p>twenty</p>
+            <p>forty</p>
+            <p>sixty</p>
+            <p>eighty</p>
+          </div>
+          <div class="times">
+            <p><span>101.0</span> - <span>102.05</span>  </p>
+            <p><span>102.0</span> - <span>103.05</span>  </p>
+            <p><span>103.0</span> - <span>104.05</span>  </p>
+            <p><span>104.0</span> - <span>105.05</span>  </p>
+            <p><span>105.0</span> - <span>106.05</span>  </p>
+            <p><span>110.0</span> - <span>111.05</span> </p>
+            <p><span>120.0</span> - <span>121.05</span> </p>
+            <p><span>140.0</span> - <span>141.05</span> </p>
+            <p><span>160.0</span> - <span>161.05</span> </p>
+            <p><span>180.0</span> - <span>181.05</span> </p>
+          </div>
+        </div>
+        <div class="split one-eighty">
+          <div class="name">
+            <p>one</p>
+            <p>two</p>
+            <p>three</p>
+            <p>four</p>
+            <p>five</p>
+            <p>ten</p>
+            <p>twenty</p>
+          </div>
+          <div class="times">
+            <p><span>181.0</span> - <span>182.05</span>  </p>
+            <p><span>182.0</span> - <span>183.05</span>  </p>
+            <p><span>183.0</span> - <span>184.05</span>  </p>
+            <p><span>184.0</span> - <span>185.05</span>  </p>
+            <p><span>185.0</span> - <span>186.05</span>  </p>
+            <p><span>190.0</span> - <span>191.05</span> </p>
+            <p><span>200.0</span> - <span>201.05</span> </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="selected">
+      <h3>Individual Tweaks</h3>
+      <div id="row">
+        <p id="name">hundred</p>
+        <input
+          type="number"
+          step=".05"
+          id="start"
+        >&nbsp;-&nbsp;
+        <input
+          type="number"
+          step=".05"
+          id="finish"
+        >
+        <button
+          type="button"
+          id="play-selected"
+        >
+          Play
+        </button>
+      </div>
+    </div>
+
+    <div id="adjust">
+      <div id="scaling">
+        <h3 class="header">Time scale</h3>
+        <div class="slider">
+          <input
+            type="range"
+            min="-100"
+            max="100"
+            id="scale"
+          >
+          <input
+            type="number"
+            name=""
+            id="value"
+          >
+        </div>
+      </div>
+
+      <div id="stretching">
+        <h3 class="header">Stretch</h3>
+        <div class="slider">
+          <input
+            type="range"
+            min="-100"
+            max="100"
+            id="stretch"
+          >
+          <input
+            type="number"
+            name=""
+            id="extend"
+          >
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button
+          type="button"
+          id="play-all"
+          class="primary"
+        >
+          Play All from End
+        </button>
+        <button
+          type="button"
+          id="stop"
+        >
+          Stop
+        </button>
+      </div>
+    </div>
+
+    <div id="presets">
+      <div id="chrome">
+        <p class="button">
+          <span class="name">Chrome</span>
+          <span class="scale">0.995</span>
+          <span class="stretch">1.03</span>
+        </p>
+      </div>
+      <div id="safari">
+        <p class="button">
+          <span class="name">Safari</span>
+          <span class="scale">0.995</span>
+          <span class="stretch">1.03</span>
+        </p>
+      </div>
+      <div id="firefox">
+        <p class="button">
+          <span class="name">Firefox</span>
+          <span class="scale">0.995</span>
+          <span class="stretch">1.03</span>
+        </p>
+      </div>
+      <div id="opera">
+        <p class="button">
+          <span class="name">Opera</span>
+          <span class="scale">0.995</span>
+          <span class="stretch">1.03</span>
+        </p>
+      </div>
+    </div>
+  </main>
+</body>
+</html>
