@@ -2,6 +2,7 @@
  * script.js
  */
 
+const DELAY = 1500
 
 const predefined   = document.getElementById("predefined")
 const selected     = document.getElementById("selected")
@@ -12,9 +13,15 @@ const playSelected = document.getElementById("play-selected")
 const playAll      = document.getElementById("play-all")
 const stop         = document.getElementById("stop")
 
+const allTimings   = getAllTimings()
+let timings        = []
+let interval       = 0
+
 
 predefined.addEventListener("click", selectTime)
 playSelected.addEventListener("click", playCustomClip)
+playAll.addEventListener("click", playAllClips)
+stop.addEventListener("click", stopPlayback)
 
 
 function selectTime({ target }) {
@@ -82,4 +89,42 @@ function playCustomClip() {
 
   const clip = JSON.parse(`[ ${begin}, ${end} ]`)
   playClip(clip)
+}
+
+
+
+function getAllTimings() {
+  const allTimes = Array.from(document.querySelectorAll(".times p"))
+
+  return allTimes.map( p => {
+    const limits = p.children
+    const begin = limits[0].innerText
+    const end = limits[1].innerText
+
+    return JSON.parse(`[ ${begin}, ${end} ]`)
+  })
+}
+
+
+
+function playAllClips(param) {
+  timings = allTimings.toReversed()
+
+  playClip(timings.shift())
+  // console.log("timings.shift:", timings.shift())
+
+  interval = setInterval(() => {
+    // console.log("timings.shift():", timings.shift())
+    playClip(timings.shift())
+
+    if (!timings.length) {
+      clearInterval(interval)
+    }
+  }, DELAY)
+}
+
+
+function stopPlayback(param) {
+  timings.length = 0
+  clearInterval(interval)
 }
