@@ -166,9 +166,9 @@ button.primary:active:hover,
       width: 5em;
     }
 
-    & button {
+    & #play-selected {
       flex-grow: 1;
-      margin-left: 1em;
+      margin: 0 1em;
     }
 
     &.disabled {
@@ -214,4 +214,9 @@ button.primary:active:hover,
   display: flex;
   justify-content: space-between;
   margin-top: 0.25em;
+}
+
+#set,
+#stop {
+  flex-basis: 7em;
 }

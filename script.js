@@ -10,6 +10,13 @@ const name         = document.getElementById("name")
 const start        = document.getElementById("start")
 const finish       = document.getElementById("finish")
 const playSelected = document.getElementById("play-selected")
+const set          = document.getElementById("set")
+const offset       = document.getElementById("offset")
+const offsetValue  = document.getElementById("offset-value")
+const scale        = document.getElementById("scale")
+const scaleValue   = document.getElementById("scale-value")
+const stretch      = document.getElementById("stretch")
+const stretchValue = document.getElementById("stretch-value")
 const playAll      = document.getElementById("play-all")
 const stop         = document.getElementById("stop")
 
@@ -17,38 +24,48 @@ const allTimings   = getAllTimings()
 let timings        = []
 let interval       = 0
 
+const settings = {
+  offset: 0,
+  scale: 1,
+  stretch: 1
+}
+
+let split
+let slot
+
 
 predefined.addEventListener("click", selectTime)
 playSelected.addEventListener("click", playCustomClip)
 playAll.addEventListener("click", playAllClips)
 stop.addEventListener("click", stopPlayback)
+set.addEventListener("click", updateSettings)
 
 
 function selectTime({ target }) {
-  const split = target.closest(".split")
+  split = target.closest(".split")
 
   if (!split) {
     // The click was in the header
     return
   }
 
-  const name = target.closest(".name p")
-  if (name) {
+  slot = target.closest(".name p")
+  if (slot) {
     // Play the standard section
     selected.classList.add("disabled")
-    playSelection(split, target)
+    playSelection(target)
 
   } else {
     selected.classList.remove("disabled")
     const bg = getComputedStyle(split).getPropertyValue("background-color")
     selected.style.backgroundColor = bg
     
-    copyToSelected(split, target)
+    copyToSelected(target)
   }
 }
 
 
-function playSelection(split, target) {
+function playSelection(target) {
   const index = Array.from(target.closest(".name").children).indexOf(target) + 1
 
   const times = split.querySelector(`.times p:nth-child(${index})`)
@@ -62,8 +79,8 @@ function playSelection(split, target) {
 }
 
 
-function copyToSelected(split, target) {
-// Copy the name and the standard section times to #selected
+function copyToSelected(target) {
+  // Copy the name and the standard section times to #selected
   const times = target.closest(".times p")
   if (times) {
     const index = Array.from(target.closest(".times").children).indexOf(times) + 1
@@ -83,12 +100,16 @@ function copyToSelected(split, target) {
 
 
 function playCustomClip() {
-  
   const begin = start.value
   const end = finish.value
 
   const clip = JSON.parse(`[ ${begin}, ${end} ]`)
   playClip(clip)
+}
+
+
+function updateSettings() {
+  // function body
 }
 
 
@@ -128,3 +149,5 @@ function stopPlayback(param) {
   timings.length = 0
   clearInterval(interval)
 }
+
+

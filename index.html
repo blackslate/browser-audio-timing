@@ -113,10 +113,33 @@
         >
           Play
         </button>
+        <button
+          type="button"
+          id="set"
+        >
+          Set
+        </button>
       </div>
     </div>
 
     <div id="adjust">
+      <div id="offsetting">
+        <h3 class="header">Initial offset</h3>
+        <div class="slider">
+          <input
+            type="range"
+            min="-100"
+            max="100"
+            id="offset"
+          >
+          <input
+            type="number"
+            name=""
+            id="offset-value"
+          >
+        </div>
+      </div>
+
       <div id="scaling">
         <h3 class="header">Time scale</h3>
         <div class="slider">
@@ -129,7 +152,7 @@
           <input
             type="number"
             name=""
-            id="value"
+            id="scale-value"
           >
         </div>
       </div>
@@ -146,7 +169,7 @@
           <input
             type="number"
             name=""
-            id="extend"
+            id="stretch-value"
           >
         </div>
       </div>
