@@ -1,0 +1,49 @@
+Firefox
+---
+
+two            1.85 -   3.1  , delta: -0.05  , stretch: 1.19
+three          3    -   4.35 , delta:  0.15  , stretch: 1.286
+four           4.05 -   5.35 , delta:  0.175 , stretch: 1.238
+five           5.45 -   6.75 , delta:  0.575 , stretch: 1.238
+ten           10.15 -  12.15 , delta:  0.625 , stretch: 1.905
+twenty        20.3  -  22    , delta:  0.625 , stretch: 1.619
+forty         40.25 -  41.5  , delta:  0.35  , stretch: 1.190
+sixty         59.95 -  61.1  , delta:  0     , stretch: 1.095
+eighty        79.45 -  80.8  , delta: -0.4   , stretch: 1.286
+hundred       99.1  - 100.35 , delta: -0.8   , stretch: 1.190
+100 + one    100.15 - 101.35 , delta: -0.775 , stretch: 1.143
+100 + two    101.05 - 102.35 , delta: -0.825 , stretch: 1.238
+100 + three  102.1  - 103.35 , delta: -0.8   , stretch: 1.19
+100 + four   103.45 - 104.75 , delta: -0.425 , stretch: 1.238
+100 + five   104.85 - 106.1  , delta: -0.05  , stretch: 1.19
+100 + ten    110.05 - 111.3  , delta:  0.15  , stretch: 1.19
+100 + twenty 119.8  - 121.1  , delta: -0.075 , stretch: 1.238
+100 + forty  139.3  - 140.55 , delta: -0.6   , stretch: 1.190
+100 + sixty  158.95 - 160.15 , delta: -0.975 , stretch: 1.143
+100 + eighty 178.65 - 179.9  , delta: -1.25  , stretch: 1.190
+180 + one    179.6  - 180.8  , delta: -1.325 , stretch: 1.143
+180 + two    180.5 - 181.75  , delta: -1.4   , stretch: 1.19
+180 + three  181.8  - 183.05 , delta: -1.1   , stretch: 1.19
+180 + four   183.15 - 184.4  , delta: -0.75  , stretch: 1.19
+180 + five   184.15  - 185.4 , delta: -0.75  , stretch: 1.19
+180 + ten    189.8  - 191.1  , delta: -0.075 , stretch: 1.238
+
+
+delta goes from -1.4 to +0.625, a range of 2.025 seconds
+
+LONG PAUSE BEFORE PLAYING:
+ten           10.15 - 12.15  , delta:  0.625 , stretch: 1.905
+
+NO SOUND AT ALL: 10.2 - 12.2
+
+
+END OF SOUND five, THEN click
+180 + five 185 - 185.9 , delta: -0.075 , stretch: 0.857
+ONL CLICK AFTER 180 + five
+180 + five 184.9 - 185.4 , delta: -0.375 , stretch: 0.476
+
+---
+
+Chrome
+---
+

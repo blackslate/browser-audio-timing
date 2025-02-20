@@ -86,67 +86,64 @@ button.primary:active:hover,
 
 
 
+main {
+  min-width: 440px;
+}
+
 & h3 {
   margin: 0;
 }
 
+#files {
+  display: flex;
+  justify-content: space-between;
+}
+
+#timing {
+  position: relative;
+}
+
+#in-use {
+  position: absolute;
+  top: 0;
+  left: 16.75em;
+  height: 100%;
+  width: 10em;
+  background-color: #fff6;
+  mix-blend-mode: soft-light;
+  pointer-events: none;
+
+  &.mp3 {
+    left: 7.25em;
+  }
+}
+
 #predefined {
-  background-color: #333;
+  list-style-type: none;
+  padding: 0;
+  height: 74vh;
+  overflow: auto;
 
-  & p {
-    margin: 0.45em 0;
+  & li {
+    margin: 0.25em 0;
+    display: flex;
   }
 
-  & .header {
-    display: flex;
-    justify-content: space-between;
-    font-weight: bold;
-
-    span {
-      width: 33%;
-      font-size: 0.8em;
-      text-decoration: underline;
-    }
+  & .button {
+    display: inline-block;
+    width: 6em;
+    margin-right: 0.5em;
   }
 
-  & .columns {
+  & span:not(.label) {
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
+    align-items: center;
+    width: 8em;
+  }
 
-
-    & .split {
-      display: flex;
-      margin-right: var(--gap);
-
-      &.one {
-        background-color: #300;
-      }
-
-      &.hundred {
-        background-color: #030;
-      }
-
-      &.one-eighty {
-        background-color: #003;
-      }
-
-      & div {
-        margin-right: var(--gap);
-
-
-        &.times p {
-          display: flex;
-          justify-content: center;
-          margin: 0.125em 0;
-        }
-      }
-
-      & span {
-        background-color: var(--dark);
-        padding: 0.125em 0.25em;
-        border: 1px solid #fff3
-      }
-    }
+  & .to {
+    margin: 0 0.25em;
   }
 }
 
@@ -157,18 +154,19 @@ button.primary:active:hover,
   #row {
     display: flex;
 
-     & p#name {
-      width: 5em;
-      margin: 0;
+     & p#label {
+      width: 6em;
+      margin: 0 0.5em 0 0;
     }
 
     & input {
       width: 5em;
     }
 
-    & #play-selected {
+    & #play-selected,
+    & #set {
       flex-grow: 1;
-      margin: 0 1em;
+      margin-left: 1em;
     }
 
     &.disabled {
@@ -177,46 +175,4 @@ button.primary:active:hover,
       pointer-events: none;
     }
   }
-}
-
-#adjust {
-  margin-top: 1em;
-
-
-  & .slider {
-    display: flex;
-
-    & [type=range] {
-      width: 85%
-    }
-
-    & [type=number] {
-      width: 15%
-    }
-  }
-
-  & .buttons {
-    margin-top: 0.5em;
-    display: flex;
-    justify-content: space-between;
-
-    & #play-all {
-      flex: 1;
-    }
-
-    & #stop {
-      flex-basis: 7em;
-    }
-  }
-}
-
-#presets {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 0.25em;
-}
-
-#set,
-#stop {
-  flex-basis: 7em;
 }

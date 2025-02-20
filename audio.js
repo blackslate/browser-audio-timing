@@ -17,7 +17,6 @@
 
 
 const audio = new Audio()
-audio.src = "./test.mp3"
 
 let playing = false // will temporarily become truthy relative path
 let timeOut
@@ -27,12 +26,12 @@ const stopPlaying = () => {
   playing = false
 }
 
-const playClip = (clip) => {
+const playClip = (url, clip) => {
   if (playing) {
     return // Let this sound play to the end
   }
 
-  console.log("clip:", clip)
+  audio.src = url
 
   const [ startTime, endTime ] = clip
   const duration = (endTime - startTime) * 1000 // ms
