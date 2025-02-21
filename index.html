@@ -26,7 +26,7 @@
           <option value="safari">Safari</option>
           <option value="edge" disabled>Edge</option>
           <option value="firefox">Firefox</option>
-          <option value="opera" disabled>Opera</option>
+          <option value="opera">Opera</option>
         </select>
       </label>
 
@@ -38,7 +38,7 @@
           <option value="safari">Safari</option>
           <option value="edge" disabled>Edge</option>
           <option value="firefox">Firefox</option>
-          <option value="opera" disabled>Opera</option>
+          <option value="opera">Opera</option>
         </select>
       </label>
     </div>
@@ -84,8 +84,22 @@
         </button>
       </div>
       <div class="buttons">
-        <button 
-          type="button" 
+        <div id="scroll">
+          <button
+            type="button"
+            id="down"
+          >
+            <img src="down.svg" alt="down">
+          </button>
+          <button
+            type="button"
+            id="up"
+          >
+            <img src="up.svg" alt="up">
+          </button>
+        </div>
+        <button
+          type="button"
           id="log-timing"
           disabled
         >
