@@ -10,18 +10,25 @@ fetch('./timings.json')
   .catch(error => console.log("error:", error))
 
 
-const DELAY = 1500
+const DELAY = 2500
 
-const selectFile   = document.getElementById("select-file")
-const browser      = document.getElementById("browser")
-const inUse        = document.getElementById("in-use")
-const predefined   = document.getElementById("predefined")
-const selected     = document.getElementById("selected")
-const label        = document.getElementById("label")
-const start        = document.getElementById("start")
-const finish       = document.getElementById("finish")
-const playSelected = document.getElementById("play-selected")
-const set          = document.getElementById("set")
+// Possibly inaccurate check on userAgent
+const userAgent    = (/chrome|safari|edge|firefox|opera/i.exec(navigator.userAgent) || ["chrome"])[0].toLowerCase()
+
+const selectFile = document.getElementById("select-file")
+const first      = document.getElementById("first")
+const second     = document.getElementById("second")
+const predefined = document.getElementById("predefined")
+const playMark   = document.getElementById("play-mark")
+const playAll    = document.getElementById("play-all")
+const stopPlay   = document.getElementById("stop")
+
+const selected   = document.getElementById("selected")
+const label      = document.getElementById("label")
+const start      = document.getElementById("start")
+const finish     = document.getElementById("finish")
+const playOne    = document.getElementById("play-one")
+const set        = document.getElementById("set")
 
 
 const settings = {
@@ -33,15 +40,23 @@ const settings = {
 let filesData      // { key: { url: "", word: { clip }}, ...}
 let url            // file containing audio
 let timing = []    // [ { label, clip: [ start, finish ]}, ... ]
+let timings = []   // [ [ start, finish ], ... ] for Play All
 let index          // of item in timing that was clicked
 let clip = [0, 0]  // [ start, finish ] of clicked item in timing
-let using = browser.value
+let interval       // integer value from clearInterval
+
+first.value = userAgent
+let using = first.value
 
 
 selectFile.addEventListener("change", changeFile)
-browser.addEventListener("change", setCompatibility)
+first.addEventListener("change", setComparison)
+second.addEventListener("change", setComparison)
 predefined.addEventListener("click", selectTime)
-playSelected.addEventListener("click", playCustomClip)
+playAll.addEventListener("click", playAllClips)
+stopPlay.addEventListener("click", stopPlayback)
+
+playOne.addEventListener("click", playCustomClip)
 start.addEventListener("change", updateClip)
 finish.addEventListener("change", updateClip)
 set.addEventListener("click", updateSettings)
@@ -67,16 +82,25 @@ function changeFile({ target }) {
   const file = target.value
   timing = Object.entries(filesData[file])
   url = timing[0][1]
-  timing = timing.map(([ label, { clip, firefox } ] ) => {
-    return { label, clip, firefox }
+  timing = timing.map(([ label, timing ] ) => {
+    if (typeof timing === "object") {
+      return { label, ...timing }
+    } else {
+      return timing // actually the audio url
+    }
   })
 
   generateList()
 }
 
 
-function setCompatibility({ target }) {
-  using = target.value
+function setComparison({ target }) {
+  const { id, value } = target
+
+  if (id === "first"){
+    using = value
+  }
+
   generateList()
 }
 
@@ -87,23 +111,32 @@ function generateList() {
   }
 
   timing.forEach(( timingData, index ) => {
-    const {  label, clip } = timingData
+    const { label, clip } = timingData
+    const left = first.value
+    const right = second.value
 
     if (index) {
       const line = document.createElement("li")
       const header = document.createElement("span")
-      header.classList.add("label", "button")
+      header.classList.add("label")
       header.innerText = label
       line.append(header)
 
-      let mid
+      // Get expected mid time of clip
+      const [ start, finish ] = clip
+      const mid = parseInt((start + finish) * 500, 10) / 1000
 
       // Standard
       {
-        const [ start, finish ] = clip
-        mid = parseInt((start + finish) * 500, 10) / 1000
+        const [ start, finish ] = timingData[left]
+        // Determine the red/blue shift with respect to expected
+        const centre = parseInt((start + finish) * 500, 10) / 1000
+        const bg = getShift(centre - mid)
+
         const times = document.createElement("span")
-        times.classList.add("clip", "button")
+        times.classList.add(left, "button")
+        times.style.backgroundColor = bg
+
         const begin = document.createElement("span")
         begin.classList.add("begin")
         begin.innerText = start.toFixed(2)
@@ -120,28 +153,15 @@ function generateList() {
         line.append(times)
       }
 
-      if (using !== "clip") {
-        const [ start, finish ] = timingData[using]
+     {
+        const [ start, finish ] = timingData[right]
 
         // Determine the red/blue shift with respect to expected
         const centre = parseInt((start + finish) * 500, 10) / 1000
-        const delta = centre - mid
-
-        let r = 0,
-            b = 0
-
-        if (delta < 0) { // min -1.4 => f
-          b = Math.round(-11 * delta).toString(16)
-        } else if (delta > 0) { // 0.625 => 7
-          r = Math.round(11 * delta).toString(16)
-        }
-
-        const bg = (r || b)
-          ? `#${r}0${b}`
-          : "transparent"
+        const bg = getShift(centre - mid)
 
         const times = document.createElement("span")
-        times.classList.add("firefox", "button")
+        times.classList.add(right, "button")
         times.style.backgroundColor = bg
         const begin = document.createElement("span")
         begin.classList.add("begin")
@@ -162,11 +182,24 @@ function generateList() {
       predefined.append(line)
     }
   })
+}
 
-  const action = (using === "clip")
-    ? "add"
-    : "remove"
-  inUse.classList[action]("mp3")
+
+function getShift(delta) {
+  let r = 0,
+      b = 0
+
+  if (delta < 0) { // min -1.4 => f
+    b = Math.round(-11 * delta).toString(16)
+  } else if (delta > 0) { // 0.625 => 7
+    r = Math.round(11 * delta).toString(16)
+  }
+
+  const shift = (r || b)
+    ? `#${r}0${b}`
+    : "#222"
+
+  return shift
 }
 
 
@@ -193,6 +226,8 @@ function copyToSelected(data, key) {
   label.innerText = data.label
   start.value = begin
   finish.value = end
+
+  playClip(url, clip)
 }
 
 
@@ -200,6 +235,38 @@ function updateClip({ target }) {
   const { id, value } = target
   const index = ( id === "finish" ) + 0
   clip[index] = parseFloat(value)
+}
+
+
+function playAllClips() {
+  timings = timing.map( timingData => (
+    timingData[using] || timingData
+  ))
+  const url = timings.shift()
+
+  let index = -1
+  playMark.classList.add("playing")
+
+  const playNext = () => {
+    index += 1
+    playMark.style.top = `${index * 2.4}em`
+
+    clip = timings.shift()
+    playClip(url, clip)
+
+    if (!timings.length) {
+      stopPlayback()
+    }
+  }
+
+  interval = setInterval(playNext, DELAY)
+  playNext()
+}
+
+
+function stopPlayback(param) {
+  clearInterval(interval)
+  playMark.classList.remove("playing")
 }
 
 
@@ -214,17 +281,8 @@ function updateSettings() {
   const actual   = (clip[0] + clip[1]) / 2
   const delta = Math.round((actual - expected) * 1000) / 1000
 
-  if (index === 1) {
-    settings.offset = delta
-    offset.value = delta
-    offsetValue.value = delta
+  let stretch = (clip[1] - clip[0]) / (original[1] - original[0])
+  stretch = Math.round(stretch * 1000) / 1000
 
-  } else { // if (index > timing.length - 9) {
-    // Use last or second last to set time scale
-
-    let stretch = (clip[1] - clip[0]) / (original[1] - original[0])
-    stretch = Math.round(stretch * 1000) / 1000
-
-    console.log(label, clip[0], "-", clip[1], ", delta:", delta, ", stretch:", stretch)
-  }
+  console.log(label, clip[0], "-", clip[1], ", delta:", delta, ", stretch:", stretch)
 }

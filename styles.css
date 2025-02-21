@@ -9,11 +9,11 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  
+
   --light: #ddd;
-  --mid: #888;
+  --mid: #999;
   --dark: #222;
-  --gap: 0.5em;
+  --gap: 0.25em;
 
   --primary: #060;
   --primary-border: #393;
@@ -38,7 +38,7 @@ body {
 
 
 div.buttons .primary {
-  margin-left: 0.5em;
+  margin-left: var(--gap);
   flex: 2
 }
 
@@ -87,7 +87,7 @@ button.primary:active:hover,
 
 
 main {
-  min-width: 440px;
+  min-width: 410px;
 }
 
 & h3 {
@@ -101,69 +101,89 @@ main {
 
 #timing {
   position: relative;
-}
+  height: 75vh;
+  margin-top: var(--gap);
 
-#in-use {
-  position: absolute;
-  top: 0;
-  left: 16.75em;
-  height: 100%;
-  width: 10em;
-  background-color: #fff6;
-  mix-blend-mode: soft-light;
-  pointer-events: none;
+  #play-mark {
+    position: absolute;
+    left: -0.25em;
+    width: 16.25em;
+    height: 2.5em;
+    background-color: #060;
+    opacity: 0;
 
-  &.mp3 {
-    left: 7.25em;
+    &.playing {
+      opacity: 0.5;
+    }
+
   }
-}
 
-#predefined {
-  list-style-type: none;
-  padding: 0;
-  height: 74vh;
-  overflow: auto;
+  #predefined {
+    position: absolute;
+    top: 0;
+    width: 100%;
+    height: 70vh;
+    overflow: auto;
 
-  & li {
-    margin: 0.25em 0;
+    margin-top: 0;
+    list-style-type: none;
+    padding: 0;
+
+    & li {
+      margin: var(--gap) 0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    & .label,
+    & .button {
+      display: inline-block;
+      width: 7em;
+    }
+
+    & span:not(.label) {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 8em;
+    }
+
+    & .to {
+      margin: 0 var(--gap);
+    }
+  }
+
+  & div.buttons {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
     display: flex;
-  }
+    justify-content: space-between;
 
-  & .button {
-    display: inline-block;
-    width: 6em;
-    margin-right: 0.5em;
-  }
-
-  & span:not(.label) {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 8em;
-  }
-
-  & .to {
-    margin: 0 0.25em;
+    & button {
+      flex-grow: 1;
+    }
   }
 }
 
 #selected {
-  margin-top: 1em;
-  padding: 0.25em;
+  margin-top: var(--gap);
+  padding: var(--gap);
 
   #row {
     display: flex;
 
      & p#label {
       width: 6em;
-      margin: 0 0.5em 0 0;
+      margin: 0 var(--gap) 0 0;
     }
 
     & input {
       width: 5em;
     }
 
-    & #play-selected,
+    & #play-one,
     & #set {
       flex-grow: 1;
       margin-left: 1em;

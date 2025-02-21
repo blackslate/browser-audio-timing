@@ -14,33 +14,50 @@
   <main>
     <div id="files">
       <label>
-        <span>Treating file: </span>
+        <span>File: </span>
         <select name="files" id="select-file">
         </select>
       </label>
 
       <label>
-        <span>Browser: </span>
-        <select id="browser">
+        <select id="first">
           <option value="clip">MP3</option>
-          <option value="chrome" disabled>Chrome</option>
+          <option value="chrome">Chrome</option>
           <option value="safari" disabled>Safari</option>
           <option value="edge" disabled>Edge</option>
-          <option value="firefox" selected>Firefox</option>
+          <option value="firefox">Firefox</option>
+          <option value="opera" disabled>Opera</option>
+        </select>
+      </label>
+
+      <label>
+        <span>compared with: </span>
+        <select id="second">
+          <option value="clip" selected>MP3</option>
+          <option value="chrome">Chrome</option>
+          <option value="safari" disabled>Safari</option>
+          <option value="edge" disabled>Edge</option>
+          <option value="firefox">Firefox</option>
           <option value="opera" disabled>Opera</option>
         </select>
       </label>
     </div>
 
     <div id="timing">
-      <div id="in-use"></div>
+      <div id="play-mark"></div>
       <ul id="predefined"></ul>
+      <div class="buttons">
+        <button type="button" id="play-all">
+          Play All First Column
+        </button>
+        <button type="button" id="stop">Stop</button>
+      </div>
     </div>
 
     <div id="selected">
-      <h3>Individual Tweaks</h3>
+      <h3>Tweak</h3>
       <div id="row">
-        <p id="label">hundred</p>
+        <p id="label"></p>
         <input
           type="number"
           step=".05"
@@ -53,7 +70,7 @@
         >
         <button
           type="button"
-          id="play-selected"
+          id="play-one"
         >
           Play
         </button>
@@ -61,7 +78,7 @@
           type="button"
           id="set"
         >
-          Set
+          Log
         </button>
       </div>
     </div>
