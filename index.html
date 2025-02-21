@@ -23,7 +23,7 @@
         <select id="first">
           <option value="clip">MP3</option>
           <option value="chrome">Chrome</option>
-          <option value="safari" disabled>Safari</option>
+          <option value="safari">Safari</option>
           <option value="edge" disabled>Edge</option>
           <option value="firefox">Firefox</option>
           <option value="opera" disabled>Opera</option>
@@ -35,7 +35,7 @@
         <select id="second">
           <option value="clip" selected>MP3</option>
           <option value="chrome">Chrome</option>
-          <option value="safari" disabled>Safari</option>
+          <option value="safari">Safari</option>
           <option value="edge" disabled>Edge</option>
           <option value="firefox">Firefox</option>
           <option value="opera" disabled>Opera</option>
@@ -71,14 +71,25 @@
         <button
           type="button"
           id="play-one"
+          disabled
         >
           Play
         </button>
         <button
           type="button"
           id="set"
+          disabled
         >
-          Log
+          Set
+        </button>
+      </div>
+      <div class="buttons">
+        <button 
+          type="button" 
+          id="log-timing"
+          disabled
+        >
+          Log Timing Data
         </button>
       </div>
     </div>

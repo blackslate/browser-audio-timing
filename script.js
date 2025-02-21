@@ -5,7 +5,7 @@
 
 fetch('./timings.json')
   .then(response => response.json())
-  .then(json => json.words)
+  .then(json => json.words || json)
   .then(initialize)
   .catch(error => console.log("error:", error))
 
@@ -29,6 +29,7 @@ const start      = document.getElementById("start")
 const finish     = document.getElementById("finish")
 const playOne    = document.getElementById("play-one")
 const set        = document.getElementById("set")
+const logTiming  = document.getElementById("log-timing")
 
 
 const settings = {
@@ -60,19 +61,28 @@ playOne.addEventListener("click", playCustomClip)
 start.addEventListener("change", updateClip)
 finish.addEventListener("change", updateClip)
 set.addEventListener("click", updateSettings)
+logTiming.addEventListener("click", logTimingData)
 
 
-function initialize(words) {
-  filesData = words
+function initialize(json) {
+  filesData = json
 
   // Create a select menu to choose which file to treat
-  const keys = Object.keys(words)
-  const options = keys.forEach( key => {
-    const option = document.createElement("option")
-    option.value = key
-    option.innerText = filesData[key].url.replace(/^[./]+/, "")
-    selectFile.append(option)
-  })
+  const keys = Object.keys(json)
+  if (keys.length > 1) {
+    const options = keys.forEach( key => {
+      const option = document.createElement("option")
+      option.value = key
+      option.innerText = filesData[key].url.replace(/^[./]+/, "")
+      selectFile.append(option)
+    })
+
+  } else {
+    const nameSpan = document.createElement("span")
+    const data = filesData[keys[0]]
+    nameSpan.innerText = data.url.replace(/^[./]+/, "")
+    selectFile.replaceWith(nameSpan)
+  }
 
   changeFile({ target: { value: keys[0] }})
 }
@@ -126,63 +136,45 @@ function generateList() {
       const [ start, finish ] = clip
       const mid = parseInt((start + finish) * 500, 10) / 1000
 
-      // Standard
-      {
-        const [ start, finish ] = timingData[left]
-        // Determine the red/blue shift with respect to expected
-        const centre = parseInt((start + finish) * 500, 10) / 1000
-        const bg = getShift(centre - mid)
-
-        const times = document.createElement("span")
-        times.classList.add(left, "button")
-        times.style.backgroundColor = bg
-
-        const begin = document.createElement("span")
-        begin.classList.add("begin")
-        begin.innerText = start.toFixed(2)
-        const to = document.createElement("span")
-        to.classList.add("to")
-        to.innerText = "-"
-        const end = document.createElement("span")
-        end.classList.add("end")
-        end.innerText = finish.toFixed(2)
-
-        times.append(begin)
-        times.append(to)
-        times.append(end)
+      // Create two columns for comparison
+      ;[left, right].forEach( side => {
+        const times = getTimes(side, timingData, mid)
         line.append(times)
-      }
-
-     {
-        const [ start, finish ] = timingData[right]
-
-        // Determine the red/blue shift with respect to expected
-        const centre = parseInt((start + finish) * 500, 10) / 1000
-        const bg = getShift(centre - mid)
-
-        const times = document.createElement("span")
-        times.classList.add(right, "button")
-        times.style.backgroundColor = bg
-        const begin = document.createElement("span")
-        begin.classList.add("begin")
-        begin.innerText = start.toFixed(2)
-        const to = document.createElement("span")
-        to.classList.add("to")
-        to.innerText = "-"
-        const end = document.createElement("span")
-        end.classList.add("end")
-        end.innerText = finish.toFixed(2)
-
-        times.append(begin)
-        times.append(to)
-        times.append(end)
-        line.append(times)
-      }
+      })
 
       predefined.append(line)
     }
   })
 }
+
+
+function getTimes(side, timingData, mid) {
+  const [ start, finish ] = timingData[side]
+  // Determine the red/blue shift with respect to expected
+  const centre = parseInt((start + finish) * 500, 10) / 1000
+  const bg = getShift(centre - mid)
+
+  const times = document.createElement("span")
+  times.classList.add(side, "button")
+  times.style.backgroundColor = bg
+
+  const begin = document.createElement("span")
+  begin.classList.add("begin")
+  begin.innerText = start.toFixed(2)
+  const to = document.createElement("span")
+  to.classList.add("to")
+  to.innerText = "-"
+  const end = document.createElement("span")
+  end.classList.add("end")
+  end.innerText = finish.toFixed(2)
+
+  times.append(begin)
+  times.append(to)
+  times.append(end)
+
+  return times
+}
+
 
 
 function getShift(delta) {
@@ -228,6 +220,10 @@ function copyToSelected(data, key) {
   finish.value = end
 
   playClip(url, clip)
+
+  playOne.removeAttribute("disabled")
+  set.removeAttribute("disabled")
+  logTiming.removeAttribute("disabled")
 }
 
 
@@ -276,7 +272,19 @@ function playCustomClip() {
 
 
 function updateSettings() {
-  const { label, clip: original } = timing[index]
+  const timingData = timing[index]
+
+  // Update the appropriate entry in the timings object
+  const {
+    label,
+    clip: original,
+    [using]: altered
+  } = timingData
+  const [ begin, end ] = clip
+  altered[0] = begin
+  altered[1] = end
+
+  // <<< Temporary logging
   const expected = (original[0]+ original[1]) / 2
   const actual   = (clip[0] + clip[1]) / 2
   const delta = Math.round((actual - expected) * 1000) / 1000
@@ -284,5 +292,21 @@ function updateSettings() {
   let stretch = (clip[1] - clip[0]) / (original[1] - original[0])
   stretch = Math.round(stretch * 1000) / 1000
 
-  console.log(label, clip[0], "-", clip[1], ", delta:", delta, ", stretch:", stretch)
+  console.log(label, begin, "-", end, ", delta:", delta, ", stretch:", stretch)
+  // Temporary >>>
+
+  // Update the button
+  const [ start, finish ] = original
+  const mid = parseInt((start + finish) * 500, 10) / 1000
+
+  const selector = `#predefined li:nth-child(${index}) .${using}`
+  const was = document.querySelector(selector)
+  const is = getTimes(using, timingData, mid)
+
+  was.replaceWith(is)
+}
+
+
+function logTimingData(param) {
+  console.log("filesData", JSON.stringify(filesData));
 }
