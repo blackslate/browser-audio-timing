@@ -95,7 +95,7 @@ button.primary:active:hover,
 /* CUSTOM // CUSTOM // CUSTOM // CUSTOM // CUSTOM // CUSTOM */
 
 main {
-  min-width: 410px;
+  min-width: 500px;
 }
 
 & h3 {
@@ -116,7 +116,7 @@ main {
 }
 
 #timing {
-  --full-height: calc(100vh - 150px);
+  --full-height: calc(100vh - 160px);
   --list-height: calc(var(--full-height) - 30px);
   position: relative;
   height: var(--full-height);

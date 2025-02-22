@@ -17,7 +17,7 @@ const DELAY = 2500
 // Calculating red/blue shift
 const MAX   = 1.5  // max observed = 1.4 for 182 on Firefox
 const PEAK  = 255  // "FF"
-const N     = 0.5  // sqrt exaggerates color at lower deltas
+const N     = 1  // use 0.5 to exaggerate color at lower deltas
 const SCALE = Math.pow(PEAK, 1/N) / MAX
 
 // Calculating top of play-mark div for Play All First Column
@@ -28,10 +28,11 @@ const JUMP      = FONT_SIZE * RATIO
 
 
 // Possibly inaccurate check on userAgent
-const userAgent = 
-  navigator.userAgent.match(/Opera|OPR\//i)
-  ? "opera"
-  : (/opr|chrome|safari|edge|firefox|opera/i.exec(navigator.userAgent) || ["chrome"])[0].toLowerCase()
+const userAgent = navigator.userAgent.match(/Edg\//i)
+  ? "edge"
+  : navigator.userAgent.match(/Opera|OPR\//i)
+    ? "opera"
+    : (/opr|chrome|safari|edge|firefox|opera/i.exec(navigator.userAgent) || ["chrome"])[0].toLowerCase()
 
 
 // Get pointers to interactive DOM elements
@@ -93,11 +94,11 @@ logTiming.addEventListener("click", logTimingData)
 
 /**
  * Called when fetch promise is resolved.
- * 
+ *
  * @param {object} json was read from timings.json
- * 
+ *
  * Create option for the select menu to choose which file to treat
- */ 
+ */
 function initialize(json) {
   filesData = json
 
@@ -107,7 +108,7 @@ function initialize(json) {
     const options = keys.forEach( key => {
       const option = document.createElement("option")
       option.value = key
-      option.innerText = filesData[key].url.replace(/^[./]+/, "")
+      option.innerText = filesData[key].url.replace(/^.*\//, "")
       selectFile.append(option)
     })
 
@@ -127,19 +128,20 @@ function initialize(json) {
 /**
  * Called when the selectFile option is changed. Loads the data
  * associated with the new audio file.
- * 
+ *
  * Creates the timing object, with the format...
- * 
+ *
  *   [ "url": "./audio.file",
  *     { label,
  *       "clip": [ start, finish ],
- *       <browser>: [ start, finish ] },
+ *       <browser>: [ start, finish ],
  *       ...
  *     },
  *     ...
  *   ]
- * 
- * ... and generates a DOM list to display the snippets
+ *
+ * ... and generates a DOM list to display the snippets, and
+ * options for the select menus to choose comparisons
  */
 function changeFile({ target }) {
   const file = target.value
@@ -154,15 +156,16 @@ function changeFile({ target }) {
     }
   })
 
+  generateOptions() // so generateList() can read the first.value
   generateList()
 }
 
 
 /**
  * Called by either the first or second comparison selector
- * 
+ *
  * @param {object} onChange event
- * 
+ *
  * Regenerates the timing list for the requested browser or source
  */
 function setComparison({ target }) {
@@ -176,28 +179,60 @@ function setComparison({ target }) {
 }
 
 
+function generateOptions() {
+  const options = Object.keys(timing[1])
+  // ['label', 'clip', <browser>, ... ]
+
+  empty(first)
+  empty(second)
+
+  options.forEach( browser => {
+    if (browser !== "label") {
+      const title = (browser === "clip")
+        ? "MP3"
+        : (browser === "browser")
+          ? "All browsers"
+          : browser[0].toUpperCase() + browser.substring(1)
+
+      const option = document.createElement("option")
+      option.value = browser
+      option.innerText = title
+
+      first.append(option)
+      second.append(option.cloneNode(true))
+    }
+  })
+
+  const selection = (options.indexOf(userAgent) < 0)
+    ? (options.indexOf("browser") < 0)
+      ? "clip"
+      : "browser"
+    : userAgent
+
+  first.value = selection
+}
+
+
 /**
  * Called by changeFile() and setComparison(), when the audio
  * file or the browser to compare changes
- * 
+ *
  * Generates a list of interactive items, each with three parts:
- *           
+ *
  *            first comparison     second comparison
  *   -----    -----------------    -----------------
  *   label    [ start, finish ]    [ start, finish ]
- * 
+ *
  * The start-finish buttons may be coloured blue or red depending
  * on whether the timing of the playback requestsneeds to be
- * earlier or later than the audio file's actual timing. 
+ * earlier or later than the audio file's actual timing.
  */
 function generateList() {
-  while (predefined.firstChild) {
-    predefined.removeChild(predefined.lastChild);
-  }
+  empty(predefined)
 
   timing.forEach(( timingData, index ) => {
     const { label, clip } = timingData
-    const left = first.value
+    const left  = first.value
     const right = second.value
 
     if (index) {
@@ -229,9 +264,9 @@ function generateList() {
  * @param {array} timingData: [ start, finish ] (seconds)
  * @param {number} mid:       actual middle of clip in audio file
  * @param {boolean} isActive: true if element is for first column
- *  
+ *
  * @returns a span element with a structure like...
- * 
+ *
  * <span
  *   class="firefox button active"
  *   style="background-color: rgb(32, 0, 0);"
@@ -240,12 +275,13 @@ function generateList() {
  *   <span>-</span>
  *   <span>2.15</span>
  * </span>
- * 
+ *
  * The background-color indicates if the timing request should be
  * earlier or later than the audio file's own data expects.
  */
 function getTimes(side, timingData, mid, isActive) {
   const [ start, finish ] = timingData[side]
+
   // Determine the red/blue shift with respect to expected
   const centre = parseInt((start + finish) * 500, 10) / 1000
   const bg = getShift(centre - mid)
@@ -255,7 +291,7 @@ function getTimes(side, timingData, mid, isActive) {
   if (isActive) {
     times.classList.add("active")
   }
-  
+
   times.style.backgroundColor = bg
 
   const begin = document.createElement("span")
@@ -273,10 +309,9 @@ function getTimes(side, timingData, mid, isActive) {
 }
 
 
-
 /**
  * Called by getTimes()
- * @param {number} delta will be the number of seconds (±) 
+ * @param {number} delta will be the number of seconds (±)
  *                 differences between the expected clip timing
  *                 and the effective timing for this browser
  * @returns a color in the format "#rr00bb", where either rr or bb
@@ -293,7 +328,8 @@ function getShift(delta) {
     r = hex(delta)
   }
 
-  const shift = (delta)
+  // Show tiny shifts as no shift, in grey
+  const shift = (Math.abs(delta) > 0.0011)
     ? `#${r}00${b}`
     : "#222"
 
@@ -311,12 +347,12 @@ function getShift(delta) {
 
 
 /**
- * Called by a click even on the #predefined list or by 
+ * Called by a click anywhere on the #predefined list or by
  * tweakNext()
- * 
+ *
  * @param {target} will be the element in an `li` item that
  * was selected.
- */ 
+ */
 function selectTime({ target }) {
   const line = target.closest("li")
   index = Array.from(predefined.children).indexOf(line) + 1
@@ -336,8 +372,21 @@ function selectTime({ target }) {
 }
 
 
+/**
+ * Called by selectTime() after a click on a column in #predefined
+ *
+ * @param {object} data: { label: <spoken number>,
+ *                         <browser>: [ { timingData }, ... ],
+ *                         ...
+ *                       }
+ * @param {string} key: name of browser/mp3 timing source
+ *
+ * Copies the label, start and end times to the Tweak zone
+ * Plays the given clip of the audio file
+ * Enables the Play, Set and Log buttons
+ */
 function copyToSelected(data, key) {
-  clip = [ ...data[key] ]
+  clip = [ ...(data[key] || data.browser) ]
   const [ begin, end ] = clip
   label.innerText = data.label
   start.value = begin
@@ -351,6 +400,15 @@ function copyToSelected(data, key) {
 }
 
 
+/**
+ * Called when the value of the #start or the #finish number input
+ * changes
+ *
+ * @param {object} target is the number input whose value changed
+ *
+ * Updates the value in the globally available clip object,
+ * but does not affect the interface or the values in fileData
+ */
 function updateClip({ target }) {
   const { id, value } = target
   const index = ( id === "finish" ) + 0
@@ -358,9 +416,20 @@ function updateClip({ target }) {
 }
 
 
+/**
+ * Sent by a click on the Play All First Column button
+ *
+ * Shows the play-mark div behind the first entry
+ * Creates a local copy of specific timing data
+ * Uses setInterval to play the first clip from the timing data
+ * until the timing data array is empty
+ *
+ * NOTE: timings and interval are global, so that the Stop button
+ * can use them to stop playback early.
+ */
 function playAllClips() {
   timings = timing.map( timingData => (
-    timingData[using] || timingData
+    timingData[using] || timingData.browser || timingData
   ))
   const url = timings.shift()
 
@@ -386,17 +455,34 @@ function playAllClips() {
 }
 
 
+/**
+ * Sent by a click on the Stop button
+ * Hides the play-mark div
+ * Clears the interval set by playAllClips(), so playback stops
+ * @param {*} param
+ */
 function stopPlayback(param) {
   clearInterval(interval)
   playMark.classList.remove("playing")
 }
 
 
+/**
+ * Sent by a click on the Play button
+ * Plays the currently defined clip of the active audio file
+ */
 function playCustomClip() {
   playClip(url, clip)
 }
 
 
+/**
+ * Sent by a clic on the Set button
+ *
+ * Update the appropriate entry in the global filesData object
+ * through its active timingData sub-object
+ * Updates the timing span in #predefined
+ */
 function updateSettings() {
   const timingData = timing[index]
 
@@ -410,18 +496,18 @@ function updateSettings() {
   altered[0] = begin
   altered[1] = end
 
-  // <<< Temporary logging
-  const expected = (original[0]+ original[1]) / 2
-  const actual   = (clip[0] + clip[1]) / 2
-  const delta = Math.round((actual - expected) * 1000) / 1000
+  // // <<< Temporary logging
+  // const expected = (original[0]+ original[1]) / 2
+  // const actual   = (clip[0] + clip[1]) / 2
+  // const delta = Math.round((actual - expected) * 1000) / 1000
 
-  let stretch = (clip[1] - clip[0]) / (original[1] - original[0])
-  stretch = Math.round(stretch * 1000) / 1000
+  // let stretch = (clip[1] - clip[0]) / (original[1] - original[0])
+  // stretch = Math.round(stretch * 1000) / 1000
 
-  console.log(label, begin, "-", end, ", delta:", delta, ", stretch:", stretch)
-  // Temporary >>>
+  // console.log(label, begin, "-", end, ", delta:", delta, ", stretch:", stretch)
+  // // Temporary >>>
 
-  // Update the button
+  // Update the timing span
   const [ start, finish ] = original
   const mid = parseInt((start + finish) * 500, 10) / 1000
 
@@ -433,6 +519,12 @@ function updateSettings() {
 }
 
 
+/**
+ * Sent by a click on an Up or Down arrow
+ * @param {object} target will be the img or the button that was
+ *                 clicked
+ * Selects (and plays) the next clip in the given direction
+ */
 function tweakNext({ target }) {
   const { id } = target.closest("[id]")
 
@@ -441,13 +533,13 @@ function tweakNext({ target }) {
   const rows = Array.from(predefined.children)
 
   const line = Math.max(
-    2, 
+    2,
     Math.min(
       index + direction,
       rows.length + 1
     )
   ) - 1
-  // HACK >> 
+  // HACK >>
 
   if (line === index) { return }
 
@@ -457,6 +549,19 @@ function tweakNext({ target }) {
 }
 
 
-function logTimingData(param) {
+/**
+ * Sent by a click on the Log Timing Data button
+ *
+ * Logs filesData to the browser console, so that it can be copied
+ * and pasted into timings.json
+ */
+function logTimingData() {
   console.log("filesData", JSON.stringify(filesData));
+}
+
+
+function empty(element) {
+  while (element.firstChild) {
+    element.removeChild(element.lastChild);
+  }
 }
